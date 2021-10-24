@@ -3,7 +3,6 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System;
 using System.Drawing;
-using System.Threading;
 
 namespace Fulga_Sergiu_Sebastian_3131B
 {
@@ -53,7 +52,7 @@ namespace Fulga_Sergiu_Sebastian_3131B
             base.OnLoad(e);
 
             GL.ClearColor(Color.MidnightBlue);
-            GL.Enable(EnableCap.DepthTest);
+            // GL.Enable(EnableCap.DepthTest);
         }
 
         // se initiaza afisarea si se seteaza viewport-ul grafic 
@@ -219,6 +218,7 @@ namespace Fulga_Sergiu_Sebastian_3131B
             using (SimpleWindow3D example = new SimpleWindow3D())
             {
                 example.Run(30.0, 0.0);
+                // Console.WriteLine()
             }
         }
     }
