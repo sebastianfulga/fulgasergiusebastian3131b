@@ -191,7 +191,7 @@ namespace Immediate_Mode_OpenTK
             {
                 camera.RotateLeft();
             }
-           
+
             // cadranul I
             if (mouse[MouseButton.Left] && mouse.X > 450)
             {
@@ -382,6 +382,9 @@ namespace Immediate_Mode_OpenTK
                în final pe ecran). */
 
             File.WriteAllText(@"log.txt", string.Empty);
+
+            File.WriteAllText(@"coordonate.txt", "15.0 0.0 0.0\n" +
+                "0.0 15.0 0.0\n0.0 0.0 15.0");
 
             using (ImmediateMode example = new ImmediateMode())
             {
