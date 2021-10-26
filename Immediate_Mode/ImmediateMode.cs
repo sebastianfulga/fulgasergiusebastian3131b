@@ -1,4 +1,4 @@
-﻿using Immediate_Mode;
+using Immediate_Mode;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
