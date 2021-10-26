@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using Immediate_Mode;
+using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
@@ -38,34 +39,15 @@ namespace Immediate_Mode_OpenTK
         /// Modificare pentru laborator 3 - punctul 8 
         /// rotire Camera cu ajutorul mouse-ului
         /// </summary>
-
+        KeyboardState lastKeyPress;
         MouseState originalMouseState;
-
-        float speed = 1.5f;
-
-        Vector3 position = new Vector3(0.0f, 0.0f, 3.0f);
-        Vector3 front = new Vector3(0.0f, 0.0f, -1.0f);
-        Vector3 up = new Vector3(0.0f, 1.0f, 0.0f);
-
-        private bool firstMove = true;
-        private bool firstMouse = true;
-        private Vector2 lastPos;
+        private Camera3D camera;
 
         public ImmediateMode() : base(800, 600, new GraphicsMode(32, 24, 0, 8))
         {
             VSync = VSyncMode.On;
-
-            Console.WriteLine("OpenGl versiunea: " + GL.GetString(StringName.Version));
-            Title = "OpenGl versiunea: " + GL.GetString(StringName.Version) + " (mod imediat)";
-
-            Console.WriteLine("\nOptiuni pentru schimbare culori: ");
-
-            Console.WriteLine("LControl - resetare culori initiale");
-            Console.WriteLine("R - gradient(Red, Honeydew, IndianRed");
-            Console.WriteLine("B - gradient(DarkBlue, MidnightBlue, CornflowerBlue)");
-            Console.WriteLine("Space - gradient(Firebrick, Bisque, Purple)");
-
-            Console.WriteLine("Apasati tasta ESCAPE pentru a iesi ...");
+            AfisareMeniu();
+            camera = new Camera3D();
         }
 
         /// <summary>
@@ -95,8 +77,6 @@ namespace Immediate_Mode_OpenTK
                     }
                 }
             }
-
-            lastPos = new Vector2(Mouse.X, Mouse.Y);
         }
 
         /// <summary>
@@ -111,7 +91,7 @@ namespace Immediate_Mode_OpenTK
 
             double aspect_ratio = Width / (double)Height;
 
-            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)aspect_ratio, 1, 64);
+            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)aspect_ratio, 1, 500);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadMatrix(ref perspective);
 
@@ -119,23 +99,9 @@ namespace Immediate_Mode_OpenTK
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref lookat);
 
-            // pozitia camerei 
-            Vector3 cameraPos = new Vector3(0.0f, 0.0f, 3.0f);
-            Vector3 cameraTarget = Vector3.Zero;
-            Vector3 cameraDirection = Vector3.Normalize(cameraPos - cameraTarget);
-
-            Vector3 up = Vector3.UnitY;
-            Vector3 cameraRight = Vector3.Normalize(Vector3.Cross(up, cameraDirection));
-
-            Vector3 cameraUp = Vector3.Cross(cameraDirection, cameraRight);
-
-            Matrix4 view = Matrix4.LookAt(new Vector3(0.0f, 0.0f, 3.0f),
-             new Vector3(0.0f, 0.0f, 0.0f),
-             new Vector3(0.0f, 1.0f, 0.0f));
-
-            view = Matrix4.LookAt(position, position + front, cameraUp);
-            GL.MatrixMode(MatrixMode.Texture);
-            GL.LoadMatrix(ref view);
+            // laborator 3 - punctul 8
+            // setare camera  
+            camera.SetCamera();
         }
 
         /// <summary>
@@ -196,55 +162,65 @@ namespace Immediate_Mode_OpenTK
                 transperanta = false;
             }
 
+            // modificare pentru laboratorul 3 - punctul 8 
             if (keyboard[Key.W])
             {
-                position += front * speed * (float)e.Time;
+                camera.RotateDown();
             }
 
             if (keyboard[Key.S])
             {
-                position -= front * speed * (float)e.Time;
+                camera.RotateUp();
             }
 
             if (keyboard[Key.A])
             {
-                position -= Vector3.Normalize(Vector3.Cross(front, up)) * speed * (float)e.Time;
+                camera.RotateLeft();
             }
 
             if (keyboard[Key.D])
             {
-                position += Vector3.Normalize(Vector3.Cross(front, up)) * speed * (float)e.Time;
-            }
-
-            if (keyboard[Key.P])
-            {
-                position += up * speed * (float)e.Time;
-            }
-
-            if (keyboard[Key.LShift])
-            {
-                position -= up * speed * (float)e.Time;
+                camera.RotateRight();
             }
 
             /// implementare laborator 3 - punct 8 
             /// se va modifica unghiul camerei cu ajutorul mouse-ului 
-
-            if (firstMouse)
+            // cadranul II 
+            if (mouse[MouseButton.Left] && mouse.X < 450)
             {
-                lastPos = new Vector2(mouse.X, mouse.Y);
-                firstMove = false;
+                camera.RotateLeft();
+            }
+           
+            // cadranul I
+            if (mouse[MouseButton.Left] && mouse.X > 450)
+            {
+                camera.RotateRight();
             }
 
-            if (firstMove)
+            if (mouse[MouseButton.Middle])
             {
-                lastPos = new Vector2(mouse.X, mouse.Y);
-                firstMove = false;
+                camera.RotateDown();
             }
-            else
+
+            if (mouse[MouseButton.Right])
             {
-                float deltaX = mouse.X - lastPos.X;
-                float deltaY = mouse.Y - lastPos.Y;
-                lastPos = new Vector2(mouse.X, mouse.Y);
+                camera.RotateUp();
+            }
+
+            // Console.WriteLine(Mouse.X + " " + Mouse.Y);
+
+            // laborator 3 - implementare functionalitate de logare la apasarea tastei M 
+            if (keyboard[Key.M] && !keyboard.Equals(lastKeyPress))
+            {
+                logare();
+            }
+            lastKeyPress = keyboard;
+
+            // la apasarea tastei H se va afisa un meniu 
+            if (keyboard[Key.H])
+            {
+                Console.Clear();
+                AfisareMeniu();
             }
         }
 
@@ -268,7 +244,7 @@ namespace Immediate_Mode_OpenTK
         /// Desenați axele de coordonate din aplicația template folosind un singur apel GL.Begin(). 
         private void DrawAxes()
         {
-            
+
             //GL.LineWidth(3.0f);
 
             // Desenează axa Ox (cu roșu).
@@ -336,8 +312,6 @@ namespace Immediate_Mode_OpenTK
                 GL.End();
                 GL.Disable(EnableCap.Blend);
             }
-
-            logare();
         }
 
         /// <summary>
@@ -367,6 +341,30 @@ namespace Immediate_Mode_OpenTK
                 fisierLog.WriteLine(color3);
                 fisierLog.WriteLine("Culori RBG pentru al treilea vertex: " + color3.R + " " + color3.G + " " + color3.B);
             }
+        }
+
+        public void AfisareMeniu()
+        {
+            Console.WriteLine("OpenGl versiunea: " + GL.GetString(StringName.Version));
+            Title = "OpenGl versiunea: " + GL.GetString(StringName.Version) + " (mod imediat)";
+
+            Console.WriteLine("\nOptiuni pentru schimbare culori: ");
+
+            Console.WriteLine("LControl - resetare culori initiale");
+            Console.WriteLine("R - gradient(Red, Honeydew, IndianRed");
+            Console.WriteLine("B - gradient(DarkBlue, MidnightBlue, CornflowerBlue)");
+            Console.WriteLine("Space - gradient(Firebrick, Bisque, Purple)");
+            Console.WriteLine("W - rotire camera in sus");
+            Console.WriteLine("S - rotire camera in jos");
+            Console.WriteLine("D - rotire camera in dreapta");
+            Console.WriteLine("A - rotire camera in stanga");
+
+            Console.WriteLine("Click stanga si cursor mouse in cadranul II - rotire camera in dreapta");
+            Console.WriteLine("Click stanga si cursor mouse in cadranul I - rotire camera in stanga");
+
+            Console.WriteLine("Apasati tasta ESCAPE pentru a iesi ...");
+            Console.WriteLine("Pentru logare apasati tasta M");
+            Console.WriteLine("Pentru afisare meniu apasati tasta H");
         }
 
         [STAThread]
