@@ -32,7 +32,8 @@ namespace Immediate_Mode_OpenTK
         /// <summary>
         /// path-ul implicit este \fulgasergiusebastian3131b\Immediate_Mode\bin\Debug\coordonate.txt 
         /// </summary>
-        private readonly string numeFisier = "coordonate.txt";
+        private readonly string numeFisier = @".\coordonate.txt";
+
         private readonly float[] coordonate = new float[9];
 
         /// <summary>
@@ -330,7 +331,7 @@ namespace Immediate_Mode_OpenTK
             Console.WriteLine(color3);
             Console.WriteLine("Culori RBG pentru al treilea vertex: " + color3.R + " " + color3.G + " " + color3.B);
 
-            using (StreamWriter fisierLog = new StreamWriter("log.txt", true))
+            using (StreamWriter fisierLog = new StreamWriter("Immediate_Mode\\log.txt", true))
             {
                 fisierLog.WriteLine(color1);
                 fisierLog.WriteLine("Culori RBG pentru primul vertex: " + color1.R + " " + color1.G + " " + color1.B);
