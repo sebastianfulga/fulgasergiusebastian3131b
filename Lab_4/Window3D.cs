@@ -1,4 +1,4 @@
-﻿using OpenTK;
+using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
@@ -11,10 +11,6 @@ namespace Lab_4
     {
         private KeyboardState previousKeyboard;
         private Randomizer random;
-
-        private Line3D firstLine;
-        private Point3D firstPoint;
-        private Triangle3D firstTriangle;
         
         /// <summary>
         /// laborator 4 - pentru punctele 1, 2, 3 - declarare obiect de tip Cub si axele de coordonate
@@ -25,7 +21,7 @@ namespace Lab_4
 
         // DEFAULTS 
         private Color DEFAULT_BACKGROUND_COLOR = Color.DeepSkyBlue;
-        private bool discoModeCub = false;
+        private bool discoModeCub3D = false;
 
         /// <summary>
         /// laborator 4 - pentru punctele 1, 2, 3 - utilizare Randomizer, afisare meniu in consola, 
@@ -192,7 +188,7 @@ namespace Lab_4
 
             if (currentKeyboard[Key.O] && !previousKeyboard[Key.O])
             {
-                discoModeCub = !discoModeCub;
+                discoModeCub3D = !discoModeCub3D;
             }
 
             previousKeyboard = currentKeyboard;
@@ -211,14 +207,12 @@ namespace Lab_4
             GL.Clear(ClearBufferMask.DepthBufferBit);
 
             // RENDER CODE 
-
-            // firstCub.DrawVertexRGB();
-            if (!discoModeCub)
+            if (!discoModeCub3D)
             {
                 firstCub.Draw();
             }
             
-            if (discoModeCub)
+            if (discoModeCub3D)
             {
                 firstCub.DrawVertexRGB();
             }
@@ -246,7 +240,7 @@ namespace Lab_4
                 "\n - este necesar sa se roteasca camera pentru a putea vedea si restul fetelor cubului 3D");
             Console.WriteLine(" W, A, S, D - optiuni pentru rotire a camerei 3D");
             Console.WriteLine(" X - DiscoMode[HAHAHA]");
-            Console.WriteLine(" O - alt DiscoMode");
+            Console.WriteLine(" O - toggle alt DiscoMode");
         }
     }
 }
