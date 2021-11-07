@@ -21,7 +21,7 @@ namespace Lab_4
 
         // DEFAULTS 
         private Color DEFAULT_BACKGROUND_COLOR = Color.DeepSkyBlue;
-        private bool discoModeCub3D = false;
+        private bool discoModeCub = false;
 
         /// <summary>
         /// laborator 4 - pentru punctele 1, 2, 3 - utilizare Randomizer, afisare meniu in consola, 
@@ -188,7 +188,7 @@ namespace Lab_4
 
             if (currentKeyboard[Key.O] && !previousKeyboard[Key.O])
             {
-                discoModeCub3D = !discoModeCub3D;
+                discoModeCub = !discoModeCub;
             }
 
             previousKeyboard = currentKeyboard;
@@ -207,12 +207,12 @@ namespace Lab_4
             GL.Clear(ClearBufferMask.DepthBufferBit);
 
             // RENDER CODE 
-            if (!discoModeCub3D)
+            if (!discoModeCub)
             {
                 firstCub.Draw();
             }
             
-            if (discoModeCub3D)
+            if (discoModeCub)
             {
                 firstCub.DrawVertexRGB();
             }
