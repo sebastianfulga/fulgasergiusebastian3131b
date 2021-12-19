@@ -12,11 +12,10 @@ namespace Lab_5
     /// </summary>
     public class MassiveObject
     {
-        private const String FILENAME = @"./../../FisiereLowPolyDeTipOBJ/stea2.obj";
-        // private const String FILENAME = @"./../../FisiereLowPolyDeTipOBJ/soccer_ball.obj";
-        // private const String FILENAME = @"./../../FisiereLowPolyDeTipOBJ/king_crown.obj";
-        // private const String FILENAME = @"./../../FisiereLowPolyDeTipOBJ/crown2.obj";
-        // private const String FILENAME = @"./../../FisiereLowPolyDeTipOBJ/thumbs.obj";
+        private const String FILENAME = @"./../../LowPolyObjFiles/stea2.obj";
+        // private const String FILENAME = @"./../../LowPolyObjFiles/soccer_ball.obj";
+        // private const String FILENAME = @"./../../LowPolyObjFiles/king_crown.obj";
+        // private const String FILENAME = @"./../../LowPolyObjFiles/thumbs.obj";
         private const float FACTOR_SCALARE_IMPORT = 10f;
 
         private List<Vector3> coordsList;
