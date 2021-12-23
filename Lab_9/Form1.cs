@@ -1,10 +1,10 @@
-﻿using System;
+﻿using OpenTK;
+using OpenTK.Graphics.OpenGL;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
 
 namespace Lab_9
 {
@@ -52,13 +52,17 @@ namespace Lab_9
         private int[] arrTrianglesList = new int[100];    //Lista de vertexuri pentru construirea cubului prin intermediul triunghiurilor. Ne bazăm pe lista de vertexuri.
         private int nTrianglesList;
 
+        /// <summary>
+        /// modificare laborator 9 - punctul 3
+        /// s-au modificat coordonatele din fisierul quads pentru a se crea suprafete diferite 
+        /// pentru a fi mai apoi texturate conform cerintei 
+        /// </summary>
         //Fișiere de in/out pentru manipularea vertexurilor.
         private string fileVertex = @"./../../vertexList.txt";
         private string fileQList = @"./../../quadsVertexList.txt";
         private string fileTList = @"./../../trianglesVertexList.txt";
         private bool statusFiles;
 
-        //Dim valuesAmbientTemplate0() As Single = {255, 0, 0, 1.0}      //Valori alternative ambientale(lumină colorată)
         //# SET 1
         private float[] valuesAmbientTemplate0 = new float[] { 0.1f, 0.1f, 0.1f, 1.0f };
         private float[] valuesDiffuseTemplate0 = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -75,21 +79,10 @@ namespace Lab_9
         private float[] valuesSpecular0 = new float[4];
         private float[] valuesPosition0 = new float[4];
 
-
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
-        //   ON_LOAD
+        // ON_LOAD
         public Form1()
         {
             InitializeComponent();
-
-            /// TODO:
-            /// În fișierul <Form1.Designer.cs>, la linia 26 înlocuiți conțînutul original cu linia de mai jos:
-            ///         this.GlControl1 = new OpenTK.GLControl(new OpenTK.Graphics.GraphicsMode(32, 24, 0, 8));
-            /// Acest mod de inițializare va activa antialiasing-ul (multisampling MSAA la 8x).
-            /// ATENTȚIE!
-            /// Veți pierde designerul grafic. Aplicația funcționează dar pentru a putea accesa designerul grafic va trebui să reveniți la constructorul
-            /// implicit al controlului OpenTK!
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -99,8 +92,6 @@ namespace Lab_9
             SetupWindowGUI();
         }
 
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
         //   SETARI INIȚIALE
         private void SetupValues()
         {
@@ -123,7 +114,6 @@ namespace Lab_9
             brick = true;
             colorTex = 0;
         }
-
         private void SetupWindowGUI()
         {
 
@@ -144,15 +134,10 @@ namespace Lab_9
             setColorSpecularLigh0Default();
         }
 
-
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
         //   MANIPULARE VERTEXURI ȘI LISTE DE COORDONATE.
         //Încărcarea coordonatelor vertexurilor și lista de compunere a obiectelor 3D.
         private void loadVertex()
         {
-
-            //Testăm dacă fișierul există
             try
             {
                 StreamReader fileReader = new StreamReader((fileVertex));
@@ -182,8 +167,6 @@ namespace Lab_9
 
         private void loadQList()
         {
-
-            //Testăm dacă fișierul există
             try
             {
                 StreamReader fileReader = new StreamReader(fileQList);
@@ -211,8 +194,6 @@ namespace Lab_9
 
         private void loadTList()
         {
-
-            //Testăm dacă fișierul există
             try
             {
                 StreamReader fileReader = new StreamReader(fileTList);
@@ -238,38 +219,31 @@ namespace Lab_9
 
         }
 
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
         //   CONTROL CAMERĂ
-
-        //Controlul camerei după axa X cu spinner numeric (un cadran).
         private void numericXeye_ValueChanged(object sender, EventArgs e)
         {
             eyePosX = (int)numericXeye.Value;
-            GlControl1.Invalidate(); //Forțează redesenarea întregului control OpenGL. Modificările vor fi luate în considerare (actualizare).
+            GlControl1.Invalidate(); 
         }
-        //Controlul camerei după axa Y cu spinner numeric (un cadran).
+
         private void numericYeye_ValueChanged(object sender, EventArgs e)
         {
             eyePosY = (int)numericYeye.Value;
-            GlControl1.Invalidate(); //Forțează redesenarea întregului control OpenGL. Modificările vor fi luate în considerare (actualizare).
+            GlControl1.Invalidate(); 
         }
-        //Controlul camerei după axa Z cu spinner numeric (un cadran).
+
         private void numericZeye_ValueChanged(object sender, EventArgs e)
         {
             eyePosZ = (int)numericZeye.Value;
-            GlControl1.Invalidate(); //Forțează redesenarea întregului control OpenGL. Modificările vor fi luate în considerare (actualizare).
+            GlControl1.Invalidate(); 
         }
-        //Controlul adâncimii camerei față de (0,0,0).
+
         private void numericCameraDepth_ValueChanged(object sender, EventArgs e)
         {
             camDepth = 1 + ((float)numericCameraDepth.Value) * 0.1f;
             GlControl1.Invalidate();
         }
 
-
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
         //   CONTROL MOUSE
         //Setăm variabila de stare pentru rotația în 2D a mouseului.
         private void setControlMouse2D(bool status)
@@ -285,7 +259,6 @@ namespace Lab_9
                 btnMouseControl2D.Text = "2D mouse control ON";
             }
         }
-        //Setăm variabila de stare pentru rotația în 3D a mouseului.
         private void setControlMouse3D(bool status)
         {
             if (status == false)
@@ -299,8 +272,6 @@ namespace Lab_9
                 btnMouseControl3D.Text = "3D mouse control ON";
             }
         }
-
-        //Controlul mișcării setului de coordonate cu ajutorul mouseului (în plan 2D/3D)
         private void btnMouseControl2D_Click(object sender, EventArgs e)
         {
             if (statusControlMouse2D == true)
@@ -326,13 +297,12 @@ namespace Lab_9
             }
         }
 
-        //Mișcarea lumii 3D cu ajutorul mouselui (click'n'drag de mouse).
         private void GlControl1_MouseMove(object sender, MouseEventArgs e)
         {
             if (statusMouseDown == true)
             {
                 mousePos = new Point(e.X, e.Y);
-                GlControl1.Invalidate();     //Forțează redesenarea întregului control OpenGL. Modificările vor fi luate în considerare (actualizare).
+                GlControl1.Invalidate(); 
             }
         }
         private void GlControl1_MouseDown(object sender, MouseEventArgs e)
@@ -344,9 +314,6 @@ namespace Lab_9
             statusMouseDown = false;
         }
 
-
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
         //   CONTROL ILUMINARE
         //Setăm variabila de stare pentru iluminare.
         private void setIlluminationStatus(bool status)
@@ -363,7 +330,6 @@ namespace Lab_9
             }
         }
 
-        //Activăm/dezactivăm iluminarea.
         private void btnLights_Click(object sender, EventArgs e)
         {
             if (lightON == false)
@@ -377,14 +343,12 @@ namespace Lab_9
             GlControl1.Invalidate();
         }
 
-        //Identifică numărul maxim de lumini pentru implementarea curentă a OpenGL.
         private void btnLightsNo_Click(object sender, EventArgs e)
         {
             int nr = GL.GetInteger(GetPName.MaxLights);
             MessageBox.Show("Nr. maxim de lumini pentru aceasta implementare OpenGL este <" + nr.ToString() + ">.");
         }
 
-        //Setăm variabila de stare pentru sursa de lumină 0.
         private void setSource0Status(bool status)
         {
             if (status == false)
@@ -399,7 +363,6 @@ namespace Lab_9
             }
         }
 
-        //Activăm/dezactivăm sursa 0 de iluminare (doar dacă iluminarea este activă).
         private void btnLight0_Click(object sender, EventArgs e)
         {
             if (lightON == true)
@@ -416,7 +379,6 @@ namespace Lab_9
             }
         }
 
-        //Schimbăm poziția sursei 0 de iluminare după axele XYZ.
         private void setTrackLigh0Default()
         {
             trackLight0PositionX.Value = (int)valuesPosition0[0];
@@ -438,8 +400,6 @@ namespace Lab_9
             valuesPosition0[2] = trackLight0PositionZ.Value;
             GlControl1.Invalidate();
         }
-
-        //Schimbăm culoarea sursei de lumină 0 (ambiental) în domeniul RGB.
         private void setColorAmbientLigh0Default()
         {
             numericLight0Ambient_Red.Value = (decimal)valuesAmbient0[0];
@@ -462,7 +422,6 @@ namespace Lab_9
             GlControl1.Invalidate();
         }
 
-        //Schimbăm culoarea sursei de lumină 0 (difuză) în domeniul RGB.
         private void setColorDifuseLigh0Default()
         {
             numericLight0Difuse_Red.Value = (decimal)valuesDiffuse0[0];
@@ -485,7 +444,6 @@ namespace Lab_9
             GlControl1.Invalidate();
         }
 
-        //Schimbăm culoarea sursei de lumină 0 (specular) în domeniul RGB.
         private void setColorSpecularLigh0Default()
         {
             numericLight0Specular_Red.Value = (decimal)valuesSpecular0[0];
@@ -508,7 +466,6 @@ namespace Lab_9
             GlControl1.Invalidate();
         }
 
-        //Resetare stare sursă de lumină nr. 0.
         private void setLight0Values()
         {
             for (int i = 0; i < valuesAmbientTemplate0.Length; i++)
@@ -534,10 +491,7 @@ namespace Lab_9
             GlControl1.Invalidate();
         }
 
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
         //   CONTROL OBIECTE 3D
-        //Setăm variabila de stare pentru afișarea/scunderea sistemului de coordonate.
         private void setControlAxe(bool status)
         {
             if (status == false)
@@ -551,8 +505,6 @@ namespace Lab_9
                 btnShowAxes.Text = "Axe Oxyz ON";
             }
         }
-
-        //Controlul axelor de coordonate (ON/OFF).
         private void btnShowAxes_Click(object sender, EventArgs e)
         {
             if (statusControlAxe == true)
@@ -566,10 +518,6 @@ namespace Lab_9
             GlControl1.Invalidate();
         }
 
-        //Setăm variabila de stare pentru desenarea cubului. Valorile acceptabile sunt:
-        //TRIANGLES = cubul este desenat, prin triunghiuri.
-        //QUADS = cubul este desenat, prin quaduri.
-        //OFF (sau orice altceva) = cubul nu este desenat.
         private void setCubeStatus(string status)
         {
             if (status.Trim().ToUpper().Equals("TRIANGLES"))
@@ -607,46 +555,35 @@ namespace Lab_9
             GlControl1.Invalidate();
         }
 
-
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
         //   ADMINISTRARE MOD 3D (METODA PRINCIPALĂ)
         private void GlControl1_Paint(object sender, PaintEventArgs e)
         {
-            //Resetează buffer-ele la valori default.
             GL.Clear(ClearBufferMask.ColorBufferBit);
             GL.Clear(ClearBufferMask.DepthBufferBit);
 
-            //Culoarea default a mediului.
             GL.ClearColor(Color.Black);
 
-            //Setări preliminară pentru mediul 3D.
-            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView((float)camDepth, 4 / 3, 1, 10000);    //Declararea perspectivei spatiale.
-            Matrix4 lookat = Matrix4.LookAt(eyePosX, eyePosY, eyePosZ, 0, 0, 0, 0, 1, 0);                   //Declararea camerei (stare inițială).
+            Matrix4 perspective = Matrix4.CreatePerspectiveFieldOfView((float)camDepth, 4 / 3, 1, 10000); 
+            Matrix4 lookat = Matrix4.LookAt(eyePosX, eyePosY, eyePosZ, 0, 0, 0, 0, 1, 0); 
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
             GL.LoadMatrix(ref perspective);
-            GL.MatrixMode(MatrixMode.Modelview);                                                             //Încărcarea modelului camerei.
+            GL.MatrixMode(MatrixMode.Modelview); 
             GL.LoadIdentity();
             GL.LoadMatrix(ref lookat);
-            GL.Viewport(0, 0, GlControl1.Width, GlControl1.Height);                                         //Mărimea suprafeței randate (scena 3D este proiectată pe aceasta).
-            GL.Enable(EnableCap.DepthTest);                                                                 //Corecții de adâncime.
-            GL.DepthFunc(DepthFunction.Less);                                                               //Corecții de adâncime.
+            GL.Viewport(0, 0, GlControl1.Width, GlControl1.Height); 
+            GL.Enable(EnableCap.DepthTest); 
+            GL.DepthFunc(DepthFunction.Less); 
 
-            //Pornim iluminarea (daca avem permisiunea să o facem).
             if (lightON == true)
             {
-                //Permite utilizarea iluminării. Fara aceasta corecție iluminarea nu functioneaza.
                 GL.Enable(EnableCap.Lighting);
             }
             else
             {
-                //Dezactivează utilizarea iluminării.
                 GL.Disable(EnableCap.Lighting);
             }
 
-            //Se creeaza sursa de iluminare. In acest caz folosim o singura sursa.
-            //Numarul de surse de lumini depinde de implementarea OpenGL, dar de obicei cel putin 8 surse sunt posibile simultan.
             GL.Light(LightName.Light0, LightParameter.Ambient, valuesAmbient0);
             GL.Light(LightName.Light0, LightParameter.Diffuse, valuesDiffuse0);
             GL.Light(LightName.Light0, LightParameter.Specular, valuesSpecular0);
@@ -654,43 +591,33 @@ namespace Lab_9
 
             if ((lightON == true) && (lightON_0 == true))
             {
-                //Activam sursa 0 de lumina. Fara aceasta actiune nu avem iluminare.
                 GL.Enable(EnableCap.Light0);
             }
             else
             {
-                //Dezactivam sursa 0 de lumina.
                 GL.Disable(EnableCap.Light0);
             }
 
-            //Controlul rotației cu mouse-ul (2D).
             if (statusControlMouse2D == true)
             {
                 GL.Rotate(mousePos.X, 0, 1, 0);
             }
 
-            //Controlul rotației cu mouse-ul (3D).
             if (statusControlMouse3D == true)
             {
                 GL.Rotate(mousePos.X, 0, 1, 1);
             }
 
-            //---------------------------
-            //---------------------------
-            //Texturare.
+            // Texturare 
             GL.Enable(EnableCap.Texture2D);
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             LoadTextures();
 
-            //---------------------------
-            //---------------------------
-            //Descrierea obiectelor 3D!!! Axe de coordonate.
             if (statusControlAxe == true)
             {
                 DeseneazaAxe();
             }
 
-            //Desenăm obiectele 3D (cub format din quads sau triunghiuri).
             if (statusCube.ToUpper().Equals("QUADS"))
             {
                 DeseneazaCubQ();
@@ -717,18 +644,10 @@ namespace Lab_9
                 DeseneazaCubT_Tex4();
             }
 
-            //Limitează viteza de randare pentru a nu supraîncarca unitatea GPU (în caz contrar randarea se face cât de rapid este posibil, pe 100% din resurse). 
-            //Dezavantajul este că o viteză prea mică poate afecta negativ cursivitatea animației!
-            //GraphicsContext.CurrentContext.SwapInterval = 1;                                         //Testati cu valori din 10 in 10!!!
-            //GraphicsContext.CurrentContext.VSync = True
-
             GlControl1.SwapBuffers();
         }
 
-
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
-        //   DESENARE OBIECTE 3D
+        // DESENARE OBIECTE 3D
         //Desenează axe XYZ.
         private void DeseneazaAxe()
         {
@@ -749,7 +668,9 @@ namespace Lab_9
             GL.End();
         }
 
-        //Desenează cubul - quads.
+        /// <summary>
+        /// modificare laborator 9 - punctul 3 
+        /// </summary>
         private void DeseneazaCubQ()
         {
             GL.Begin(PrimitiveType.Quads);
@@ -776,7 +697,9 @@ namespace Lab_9
             GL.End();
         }
 
-        //Desenează cubul - triunghuri.
+        /// <summary>
+        /// modificare laborator 9 - punctul 3 
+        /// </summary>
         private void DeseneazaCubT()
         {
             GL.Begin(PrimitiveType.Triangles);
@@ -800,10 +723,7 @@ namespace Lab_9
             GL.End();
         }
 
-
-        //-----------------------------------------------------------------------------------------
-        //-----------------------------------------------------------------------------------------
-        //   TEXTURARE
+        // Texturare 
         private void LoadTextures()
         {
             GL.GenTextures(textures.Length, textures);
@@ -830,7 +750,6 @@ namespace Lab_9
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (float)TextureMagFilter.Linear);
         }
 
-        //Selecția imaginii texturii.
         private void rbTexture0_CheckedChanged(object sender, EventArgs e)
         {
             brick = true;
@@ -839,7 +758,7 @@ namespace Lab_9
         {
             brick = false;
         }
-        //Selecția culorii texturii.
+
         private void rbColorWhite_CheckedChanged(object sender, EventArgs e)
         {
             colorTex = 0;
@@ -852,8 +771,6 @@ namespace Lab_9
         {
             colorTex = 2;
         }
-
-        //Încărcare cub triunghiuri.
         private void btnTexT_1_Click(object sender, EventArgs e)
         {
             resetTexCubes();
@@ -876,8 +793,6 @@ namespace Lab_9
         {
             resetTexCubes();
         }
-
-        //Încărcare cub quad.
         private void btnTexQ_1_Click(object sender, EventArgs e)
         {
             resetTexCubes();
@@ -911,7 +826,9 @@ namespace Lab_9
             GlControl1.Invalidate();
         }
 
-        //Desenează cubul - quads - textura 1 - 100%.
+        /// <summary>
+        ///  modificare laborator 9 - punctul 3
+        /// </summary>
         private void DeseneazaCubQ_Tex1()
         {
             if (brick == true)
@@ -926,7 +843,7 @@ namespace Lab_9
             switch (colorTex)
             {
                 case 0:
-                    GL.Color3(Color.White);      //Culoarea albă permite maparea texturii fără alterarea culorii originale.
+                    GL.Color3(Color.White); 
                     break;
                 case 1:
                     GL.Color3(Color.FromArgb(0, 255, 0, 0));
@@ -940,7 +857,6 @@ namespace Lab_9
             GL.Begin(PrimitiveType.Quads);
             for (int i = 0; i < nQuadsList; i = i + 4)
             {
-                //Atenție la modul de specificare a coordonatelor texturilor vis-a-vis de lista de vertexuri de intrare!
                 GL.TexCoord2(0.0, 1.0);
                 GL.Vertex3(arrVertex[arrQuadsList[i], 0], arrVertex[arrQuadsList[i], 1], arrVertex[arrQuadsList[i], 2]);
                 GL.TexCoord2(1.0, 1.0);
@@ -953,7 +869,9 @@ namespace Lab_9
             GL.End();
         }
 
-        //Desenează cubul - quads - textura 1 - 50%.
+        /// <summary>
+        /// modificare laborator 9 - punctul 3 
+        /// </summary>
         private void DeseneazaCubQ_Tex2()
         {
             if (brick == true)
@@ -968,7 +886,7 @@ namespace Lab_9
             switch (colorTex)
             {
                 case 0:
-                    GL.Color3(Color.White);      //Culoarea albă permite maparea texturii fără alterarea culorii originale.
+                    GL.Color3(Color.White); 
                     break;
                 case 1:
                     GL.Color3(Color.FromArgb(0, 255, 0, 0));
@@ -994,7 +912,9 @@ namespace Lab_9
             GL.End();
         }
 
-        //Desenează cubul - triangles - textura 1 - 100%.
+        /// <summary>
+        /// modificare laborator 9 - punctul 3 
+        /// </summary>
         private void DeseneazaCubT_Tex3()
         {
             if (brick == true)
@@ -1009,7 +929,7 @@ namespace Lab_9
             switch (colorTex)
             {
                 case 0:
-                    GL.Color3(Color.White);      //Culoarea albă permite maparea texturii fără alterarea culorii originale.
+                    GL.Color3(Color.White); 
                     break;
                 case 1:
                     GL.Color3(Color.FromArgb(0, 255, 0, 0));
@@ -1023,10 +943,6 @@ namespace Lab_9
             GL.Begin(PrimitiveType.Triangles);
             for (int i = 0; i < nTrianglesList; i = i + 6)
             {
-                //Atenție la modul de specificare a coordonatelor texturilor vis-a-vis de lista de vertexuri de intrare!
-                //La maparea texturii pe triughi pot apare deformări in imaginea texturată, porțiuni lipsă, etc. Pentru o eficiență crescută se pot folosi 2 triughiuri
-                //ce formează un pătrat pentru procesare.
-
                 GL.TexCoord2(0.0, 0.0);
                 GL.Vertex3(arrVertex[arrTrianglesList[i], 0], arrVertex[arrTrianglesList[i], 1], arrVertex[arrTrianglesList[i], 2]);
                 GL.TexCoord2(1.0, 0.0);
@@ -1043,7 +959,9 @@ namespace Lab_9
             GL.End();
         }
 
-        //Desenează cubul - triunghuri.
+        /// <summary>
+        /// modificare laborator 9 - punctul 3 
+        /// </summary>
         private void DeseneazaCubT_Tex4()
         {
             if (brick == true)
@@ -1058,7 +976,7 @@ namespace Lab_9
             switch (colorTex)
             {
                 case 0:
-                    GL.Color3(Color.White);      //Culoarea albă permite maparea texturii fără alterarea culorii originale.
+                    GL.Color3(Color.White); 
                     break;
                 case 1:
                     GL.Color3(Color.FromArgb(0, 255, 0, 0));
@@ -1072,10 +990,6 @@ namespace Lab_9
             GL.Begin(PrimitiveType.Triangles);
             for (int i = 0; i < nTrianglesList; i = i + 6)
             {
-                //Atenție la modul de specificare a coordonatelor texturilor vis-a-vis de lista de vertexuri de intrare!
-                //La maparea texturii pe triughi pot apare deformări in imaginea texturată, porțiuni lipsă, etc. Pentru o eficiență crescută se pot folosi 2 triughiuri
-                //ce formează un pătrat pentru procesare.
-
                 GL.TexCoord2(0.0, 0.0);
                 GL.Vertex3(arrVertex[arrTrianglesList[i], 0], arrVertex[arrTrianglesList[i], 1], arrVertex[arrTrianglesList[i], 2]);
                 GL.TexCoord2(0.5, 0.0);
